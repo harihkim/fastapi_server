@@ -94,6 +94,8 @@ async def get_status(file_id: int):
     else:
         print_lock.acquire(blocking=True)
         if file_id in printed_id_list:
+            print_lock.release()
+            id_lock.release()
             return {"status" : "printed"}
         print_lock.release()
         id_lock.release()

@@ -16,7 +16,7 @@ id_lock: Lock = Lock()
 print_lock: Lock = Lock()
 
 @app.post("/uploadfile/")
-async def queue_file(file: UploadFile,
+def queue_file(file: UploadFile,
                      no_of_copies: int = Form(default=1),
                      is_double_side: bool = Form(default=False),
                      is_colour_print: bool = Form(default=False),
@@ -50,7 +50,7 @@ async def queue_file(file: UploadFile,
 
 
 @app.get("/download_pdf")
-async def download_pdf():
+def download_pdf():
     found: bool = False
     try:
         print_info: PrintInfo = file_queue.get(block=True, timeout=2)
@@ -85,20 +85,17 @@ async def download_pdf():
     return Response(content=pdf_file, headers=headers, media_type="application/pdf")
 
 @app.get("/status")
-async def get_status(file_id: int):
+def get_status(file_id: int):
     id_lock.acquire(blocking=True)
     position: int = -1
     if file_id in id_list:
         position = id_list.index(file_id)
         id_lock.release()
     else:
-        print_lock.acquire(blocking=True)
         if file_id in printed_id_list:
-            print_lock.release()
             id_lock.release()
             return {"status" : "printed"}
         else:
-            print_lock.release()
             id_lock.release()
 
     if position == -1:
@@ -109,16 +106,14 @@ async def get_status(file_id: int):
     }
 
 @app.get("/printed")
-async def remove_id():
+def remove_id():
     sent_queue.get()
     id_lock.acquire(blocking=True)
     print("locked")
-    # print_lock.acquire(blocking=True)
     printed_id_list.append(id_list[0])
     print("appended")
     del id_list[0]
     print("deleted")
-    # print_lock.release()
     id_lock.release()
     print("released")
     return {"status" : "removed"}

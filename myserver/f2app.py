@@ -109,7 +109,11 @@ def get_status(file_id: int):
 
 @app.get("/printed")
 def remove_id():
-    # sent_queue.get(timeout=2)
+    try:
+        sent_queue.get(timeout=2)
+    except Exception as e:
+        print(e)
+        return {"status":"no file"}
     id_lock.acquire(blocking=True)
     print("locked")
     printed_id_list.append(id_list[0])

@@ -31,11 +31,12 @@ def queue_file(file: UploadFile,
                                       is_double_side, 
                                       is_colour_print, 
                                       page_count)
-    file_queue.put(print_info)
+    
 
     local_id: int = -1
 
     id_lock.acquire(blocking=True)
+    file_queue.put(print_info)
     global id
     id = id + 1
     local_id = id
@@ -54,6 +55,7 @@ def download_pdf():
     found: bool = False
     try:
         print_info: PrintInfo = file_queue.get(block=True, timeout=2)
+        sent_queue.put(print_info)
         found = True
     except Exception:
         res = """{
@@ -107,7 +109,7 @@ def get_status(file_id: int):
 
 @app.get("/printed")
 def remove_id():
-    sent_queue.get()
+    # sent_queue.get(timeout=2)
     id_lock.acquire(blocking=True)
     print("locked")
     printed_id_list.append(id_list[0])

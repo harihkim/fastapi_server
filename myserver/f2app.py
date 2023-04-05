@@ -97,8 +97,9 @@ async def get_status(file_id: int):
             print_lock.release()
             id_lock.release()
             return {"status" : "printed"}
-        print_lock.release()
-        id_lock.release()
+        else:
+            print_lock.release()
+            id_lock.release()
 
     if position == -1:
         return {"status": f"id = {file_id} not found"}

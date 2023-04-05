@@ -94,8 +94,10 @@ async def get_status(file_id: int):
     else:
         print_lock.acquire(blocking=True)
         if file_id in printed_id_list:
-            print_lock.release()
             return {"status" : "printed"}
+        print_lock.release()
+        id_lock.release()
+
     if position == -1:
         return {"status": f"id = {file_id} not found"}
     return {
@@ -113,3 +115,5 @@ async def remove_id():
     id_lock.release()
     print_lock.release()
     return {"status" : "removed"}
+
+# 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

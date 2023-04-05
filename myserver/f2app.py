@@ -111,12 +111,16 @@ async def get_status(file_id: int):
 @app.get("/printed")
 async def remove_id():
     sent_queue.get()
-    print_lock.acquire(blocking=True)
     id_lock.acquire(blocking=True)
+    print("locked")
+    # print_lock.acquire(blocking=True)
     printed_id_list.append(id_list[0])
+    print("appended")
     del id_list[0]
+    print("deleted")
+    # print_lock.release()
     id_lock.release()
-    print_lock.release()
+    print("released")
     return {"status" : "removed"}
 
 # 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
